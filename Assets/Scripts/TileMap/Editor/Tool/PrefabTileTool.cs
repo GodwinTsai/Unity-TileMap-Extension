@@ -14,7 +14,7 @@ using Object = UnityEngine.Object;
 
 public static class PrefabTileTool
 {
-	[MenuItem("Tool/TileMap/Generate PrefabTile")]
+	[MenuItem("Assets/TileMapTool/Generate PrefabTile")]
 	public static void GeneratePrefabTiles()
 	{
 		var prefabs = CommonToolUtil.GetSelectPrefabs();
@@ -22,7 +22,7 @@ public static class PrefabTileTool
 		PrefabTilePreviewUtil.Reset();
 	}
 	
-	[MenuItem("Tool/TileMap/ClearProgressBar")]
+	[MenuItem("Assets/TileMapTool/ClearProgressBar")]
 	public static void ClearProgressBar()
 	{
 		EditorUtility.ClearProgressBar();

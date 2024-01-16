@@ -7,7 +7,7 @@ using UnityEngine.Tilemaps;
 
 namespace UnityEditor.Tilemaps
 {
-    internal abstract class PaintableGrid : ScriptableObject
+    public abstract class PaintableGrid : ScriptableObject
     {
         private const int k_MaxMouseCellDelta = 500;
 

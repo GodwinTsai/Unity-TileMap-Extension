@@ -8,7 +8,7 @@ using Object = UnityEngine.Object;
 
 namespace UnityEditor.Tilemaps
 {
-    internal class GridPaintPaletteClipboard : PaintableGrid
+    public class GridPaintPaletteClipboard : PaintableGrid
     {
         static class Styles
         {

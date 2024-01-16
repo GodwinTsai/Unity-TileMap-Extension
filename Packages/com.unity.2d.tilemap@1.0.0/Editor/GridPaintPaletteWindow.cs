@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using UnityEditor.EditorTools;
 using UnityEditor.ShortcutManagement;
@@ -12,7 +13,7 @@ using UnityEditor.SceneManagement;
 
 namespace UnityEditor.Tilemaps
 {
-    internal class GridPaintPaletteWindow : EditorWindow
+    public class GridPaintPaletteWindow : EditorWindow
     {
         internal enum TilemapFocusMode
         {
@@ -124,6 +125,7 @@ namespace UnityEditor.Tilemaps
             public static readonly float dragPadding = 3f;
 
             public static readonly GUILayoutOption[] dropdownOptions = { GUILayout.Width(k_DropdownWidth) };
+            public static readonly GUIContent refreshBtn = EditorGUIUtility.TrTextContent("Refresh", "Auto Select Brush & Active Target");
         }
 
         private class TilePaletteSaveScope : IDisposable
@@ -1143,6 +1145,7 @@ namespace UnityEditor.Tilemaps
                     clipboardView.isModified ? Styles.editModified : Styles.edit,
                     EditorStyles.toolbarButton);
             }
+            DrawRefreshBtn();
             GUILayout.FlexibleSpace();
             using (new EditorGUI.DisabledScope(palette == null))
             {
@@ -1194,6 +1197,8 @@ namespace UnityEditor.Tilemaps
             if (i < GridPalettes.palettes.Count)
             {
                 palette = GridPalettes.palettes[i];
+                AutoSelectBrushType(palette.name);
+                AutoSelectActiveTarget();
             }
             else
             {
@@ -1420,6 +1425,69 @@ namespace UnityEditor.Tilemaps
             GridPaintPaletteWindow w = GetWindow<GridPaintPaletteWindow>();
             w.titleContent = Styles.tilePalette;
         }
+
+        #region Auto Select
+        private void DrawRefreshBtn()
+        {
+            if (GUILayout.Button(Styles.refreshBtn))
+            {
+                AutoSelectActiveTarget();
+            }
+        }
+
+        public void AutoSelectActiveTarget()
+        {
+            var target = palette;
+            string[] words = target.name.Split('_');
+            string activeTargetName;
+            if (words[^1].Equals("prefab"))
+            {
+                activeTargetName = words[^2];
+            }
+            else
+            {
+                activeTargetName = words[^1];
+            }
+            
+            activeTargetName = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(activeTargetName);
+            GridPaintingState.FlushCache();
+            bool find = false;
+            foreach (var t in GridPaintingState.validTargets)
+            {
+                if (t.name.Equals(activeTargetName))
+                {
+                    find = true;
+                    GridPaintingState.scenePaintTarget = t;
+                    if (GridPaintingState.scenePaintTarget != null)
+                    {
+                        EditorGUIUtility.PingObject(GridPaintingState.scenePaintTarget);
+                    }
+                    break;
+                }
+            }
+            
+            if (find == false)
+            {
+                if (GridPaintingState.validTargets.Length > 0)
+                {
+                    GridPaintingState.scenePaintTarget = null;
+                }
+            }
+        }
+
+        private void AutoSelectBrushType(string paletteName)
+        {
+            if (paletteName.Trim().EndsWith("_prefab"))
+            {
+                GridPaintingState.gridBrush = GridPaletteBrushes.brushes[^1];
+            }
+            else
+            {
+                GridPaintingState.gridBrush = GridPaletteBrushes.brushes[0];
+            }
+        }
+
+        #endregion
 
         // TODO: Better way of clearing caches than AssetPostprocessor
         public class AssetProcessor : AssetPostprocessor

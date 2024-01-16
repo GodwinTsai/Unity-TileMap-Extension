@@ -121,6 +121,7 @@ namespace UnityEditor.Tilemaps
         {
             if (brushTarget == null)
             {
+                EditorWindow.GetWindow<GridPaintPaletteWindow>().AutoSelectActiveTarget();
                 return;
             }
             // Do not allow editing palettes
@@ -169,6 +170,7 @@ namespace UnityEditor.Tilemaps
         {
             if (brushTarget == null)
             {
+                EditorWindow.GetWindow<GridPaintPaletteWindow>().AutoSelectActiveTarget();
                 return;
             }
             if (brushTarget == null || brushTarget.layer == 31 || brushTarget.transform == null)
@@ -185,7 +187,7 @@ namespace UnityEditor.Tilemaps
                     {
                         Undo.DestroyObjectImmediate(objectInCell);
                     }
-                    catch (Exception e)
+                    catch (Exception)
                     {
                         DestroyObjectInPrefabAsset(objectInCell);
                     }
